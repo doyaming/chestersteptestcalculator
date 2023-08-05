@@ -1,59 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    background-image: url('https://tpcjournal.taipower.com.tw/uploads/article/fd66516628ab1acbcb8e83d0f5300a95.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-color: rgba(0, 0, 0, 0.5);
-}
+	<style>
  #chart {
     width: 1000px;
     height: 270px;
-    background-image: url('https://tpcjournal.taipower.com.tw/uploads/article/fd66516628ab1acbcb8e83d0f5300a95.jpg');
-    background-size: cover; /* 背景图像自适应尺寸 */
-    background-repeat: no-repeat; /* 防止背景图像重复显示 */
 }
 
-/* 适用于小屏幕设备（最大宽度：480像素） */
+/* 在小screen */
 @media screen and (max-width: 480px) {
     #chart {
         width: 1000px;
         height: 270px;
-        background-image: url('https://tpcjournal.taipower.com.tw/uploads/article/fd66516628ab1acbcb8e83d0f5300a95.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
         overflow: auto;
     }
 }
 
-/* 适用于中等屏幕设备（最小宽度：481像素，最大宽度：1366像素） */
+/* 在中screen */
 @media screen and (min-width: 481px) and (max-width: 1366px) {
     #chart {
         width: 1000px;
         height: 270px;
-        background-image: url('https://tpcjournal.taipower.com.tw/uploads/article/fd66516628ab1acbcb8e83d0f5300a95.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
         overflow: auto;
     }
 }
 
-/* 适用于大屏幕设备（最小宽度：1367像素） */
+/* 在大screen */
 @media screen and (min-width: 1367px) {
     #chart {
         width: 1000px;
         height: 270px;
-        background-image: url('https://tpcjournal.taipower.com.tw/uploads/article/fd66516628ab1acbcb8e83d0f5300a95.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
         overflow: auto;
     }
 }
-</style>
+    </style>
     <meta charset="UTF-8">
     <title>計算最大攝氧量</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
