@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+ #chart {
+    width: 1000px;
+    height: 270px;
+}
+
+/* 在小screen */
+@media screen and (max-width: 480px) {
+    #chart {
+        width: 1000px;
+        height: 270px;
+        overflow: auto;
+    }
+}
+
+/* 在中screen */
+@media screen and (min-width: 481px) and (max-width: 1366px) {
+    #chart {
+        width: 1000px;
+        height: 270px;
+        overflow: auto;
+    }
+}
+
+/* 在大screen */
+@media screen and (min-width: 1367px) {
+    #chart {
+        width: 1000px;
+        height: 270px;
+        overflow: auto;
+    }
+}
+    </style>
+    <meta charset="UTF-8">
+    <title>計算最大攝氧量</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        var plot;
+
+        function calculateMaxOxygen() {
+            if (plot) {
+                Plotly.purge('chart');
+            }
+
+            var stage_hr_values = [];
+            var stage_hr_elements = document.getElementsByClassName('stage_hr');
+            for (var i = 0; i < stage_hr_elements.length; i++) {
+                var value = parseInt(stage_hr_elements[i].value);
+                if (!isNaN(value)) {
+                    stage_hr_values.push(value);
+                }
+            }
+
+            var age = calculateAge();
+
+            var max_hr = 220 - age;
+            var max_hr_output = document.getElementById('max_hr');
+            var max_oxygen_output = document.getElementById('max_oxygen');
+            var max_oxygen_08_output = document.getElementById('max_oxygen_08');
+
+            max_hr_output.innerHTML = max_hr;
+            max_oxygen_output.innerHTML = calculateMaxOxygenValue(max_hr).toFixed(2);
+            max_oxygen_08_output.innerHTML = (0.8 * max_hr).toFixed(2);
+
+            if (stage_hr_values.length < 3) {
+                max_oxygen_output.innerHTML = 'Fail';
+                return;
+            }
+
+            // Perform linear regression
+            var x = stage_hr_values;
+            var y = [14, 20, 26, 32, 38].slice(0, x.length);
+
+            var sumX = 0;
+            var sumY = 0;
+            var sumXY = 0;
+            var sumXX = 0;
+
+            for (var i = 0; i < x.length; i++) {
+                sumX += x[i];
+                sumY += y[i];
+                sumXY += x[i] * y[i];
+                sumXX += x[i] * x[i];
+            }
+
+            var n = x.length;
+            var slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            var intercept = (sumY - slope * sumX) / n;
+
+            var max_oxygen = slope * max_hr + intercept;
+
+            // Display the result
+            max_oxygen_output.innerHTML = max_oxygen.toFixed(2);
+
+            // Plot the graph
+            var trace = {
+                x: x,
+                y: y,
+                mode: 'markers',
+                type: 'scatter',
+                name: 'Data Points'
+            };
+
+            var regressionLine = {
+                x: [Math.min(...x), max_hr],
+                y: [intercept + slope * Math.min(...x), intercept + slope * max_hr],
+                mode: 'lines',
+                type: 'scatter',
+                name: 'Regression Line'
+            };
+
+            var maxOxygenPoint = {
+                x: [max_hr],
+                y: [max_oxygen],
+                mode: 'markers',
+                type: 'scatter',
+                name: 'Max Oxygen',
+                marker: {
+                    color: 'red',
+                    size: 10
+                }
+            };
+
+            var layout = {
+                title: 'Max Oxygen and Heart Rate',
+                xaxis: { title: 'Heart Rate' },
+                yaxis: { title: 'Max Oxygen' }
+            };
+
+            var plotData = [trace, regressionLine, maxOxygenPoint];
+
+            plot = Plotly.newPlot('chart', plotData, layout);
+        }
+
+        function calculateAge() {
+            var birthdate = document.getElementById('birthdate').value;
+            var today = new Date();
+            var birthdateObj = new Date(birthdate);
+            var age = today.getFullYear() - birthdateObj.getFullYear();
+            var monthDiff = today.getMonth() - birthdateObj.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        function calculateMaxOxygenValue(max_hr) {
+            return 15.3 * max_hr / 1000;
+        }
+
+        window.onload = function() {
+            var today = new Date();
+            var todayDateElement = document.getElementById('today_date');
+            todayDateElement.innerHTML = today.toLocaleDateString();
+        }
+    </script>
+</head>
+<body>
+    <h1>計算最大攝氧量</h1>
+    <p>今天日期: <span id="today_date"></span></p>
+
+    <label for="name">姓名：</label>
+    <input type="text" id="name" required><br><br>
+
+    <label for="gender">性別：</label>
+    <select id="gender" required>
+        <option value="male">男</option>
+        <option value="female">女</option>
+    </select><br><br>
+
+    <label for="birthdate">生日：</label>
+    <input type="date" id="birthdate" required><br><br>
+
+    <label for="medical_record">病歷號：</label>
+    <input type="text" id="medical_record" required><br><br>
+
+    <h2>輸入各階段心率：</h2>
+    <label for="stage1_hr">階段 1 心率：</label>
+    <input type="number" class="stage_hr" required><br><br>
+
+    <label for="stage2_hr">階段 2 心率：</label>
+    <input type="number" class="stage_hr" required><br><br>
+
+    <label for="stage3_hr">階段 3 心率：</label>
+    <input type="number" class="stage_hr"><br><br>
+
+    <label for="stage4_hr">階段 4 心率：</label>
+    <input type="number" class="stage_hr"><br><br>
+
+    <label for="stage5_hr">階段 5 心率：</label>
+    <input type="number" class="stage_hr"><br><br>
+
+    <button onclick="calculateMaxOxygen()">計算</button>
+
+    <h2>最大心率：</h2>
+    <p id="max_hr"></p>
+
+    <h2>0.8倍最大心率：</h2>
+    <p id="max_oxygen_08"></p>
+
+    <h2>最大攝氧量：</h2>
+    <p id="max_oxygen"></p>
+
+    <h2>圖表：</h2>
+    <div id="chart"></div>
+</body>
+</html>
