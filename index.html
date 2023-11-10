@@ -1,253 +1,369 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<style>
- #chart {
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Entry by codeSith</title>
+    <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+        crossorigin="anonymous" 
+    />
+    
+    <style>
+        form {
+            font-size: 20px !important;
+            width: auto;
+			
+        }
+        #chart {
     width: 1000px;
-    height: 270px;
+    height: 250px;
 }
-
-/* 在小screen */
-@media screen and (max-width: 480px) {
-    #chart {
-        width: 1000px;
-        height: 270px;
-        overflow: auto;
-    }
-}
-
-/* 在中screen */
-@media screen and (min-width: 481px) and (max-width: 1366px) {
-    #chart {
-        width: 1000px;
-        height: 270px;
-        overflow: auto;
-    }
-}
-
-/* 在大screen */
-@media screen and (min-width: 1367px) {
-    #chart {
-        width: 1000px;
-        height: 270px;
-        overflow: auto;
-    }
-}
-</style>
-<meta charset="UTF-8">
-<title>計算最大攝氧量</title>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script>
-    var plot;
-
-    function calculateMaxOxygen() {
-        if (plot) {
-            Plotly.purge('chart');
-        }
-
-        var stage_hr_values = [];
-        var stage_hr_elements = document.getElementsByClassName('stage_hr');
-        for (var i = 0; i < stage_hr_elements.length; i++) {
-            var value = parseInt(stage_hr_elements[i].value);
-            if (!isNaN(value)) {
-                stage_hr_values.push(value);
-            }
-        }
-
-        var age = calculateAge();
-
-        var max_hr = 220 - age;
-        var max_hr_output = document.getElementById('max_hr');
-        var max_oxygen_output = document.getElementById('max_oxygen');
-        var max_oxygen_08_output = document.getElementById('max_oxygen_08');
-
-        max_hr_output.innerHTML = max_hr;
-        max_oxygen_output.innerHTML = calculateMaxOxygenValue(max_hr).toFixed(2);
-        max_oxygen_08_output.innerHTML = (0.8 * max_hr).toFixed(2);
-
-        if (stage_hr_values.length < 3) {
-            max_oxygen_output.innerHTML = 'Fail';
-            return;
-        }
-
-        // Perform linear regression
-        var x = stage_hr_values;
-        var y = [14, 20, 26, 32, 38].slice(0, x.length);
-
-        var sumX = 0;
-        var sumY = 0;
-        var sumXY = 0;
-        var sumXX = 0;
-
-        for (var i = 0; i < x.length; i++) {
-            sumX += x[i];
-            sumY += y[i];
-            sumXY += x[i] * y[i];
-            sumXX += x[i] * x[i];
-        }
-
-        var n = x.length;
-        var slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-        var intercept = (sumY - slope * sumX) / n;
-
-        var max_oxygen = slope * max_hr + intercept;
-
-        // Display the result
-        max_oxygen_output.innerHTML = max_oxygen.toFixed(2);
-
-        // Plot the graph
-        var trace = {
-            x: x,
-            y: y,
-            mode: 'markers',
-            type: 'scatter',
-            name: 'Data Points'
-        };
-
-        var regressionLine = {
-            x: [Math.min(...x), max_hr],
-            y: [intercept + slope * Math.min(...x), intercept + slope * max_hr],
-            mode: 'lines',
-            type: 'scatter',
-            name: 'Regression Line'
-        };
-
-        var maxOxygenPoint = {
-            x: [max_hr],
-            y: [max_oxygen],
-            mode: 'markers',
-            type: 'scatter',
-            name: 'Max Oxygen',
-            marker: {
-                color: 'red',
-                size: 10
-            }
-        };
-
-        var layout = {
-            title: 'Max Oxygen and Heart Rate',
-            xaxis: { title: 'Heart Rate' },
-            yaxis: { title: 'Max Oxygen' }
-        };
-
-        var plotData = [trace, regressionLine, maxOxygenPoint];
-
-        plot = Plotly.newPlot('chart', plotData, layout);
-    }
-
-    function calculateAge() {
-        var birthdate = document.getElementById('birthdate').value;
-        var today = new Date();
-        var birthdateObj = new Date(birthdate);
-        var age = today.getFullYear() - birthdateObj.getFullYear();
-        var monthDiff = today.getMonth() - birthdateObj.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
-            age--;
-        }
-        return age;
-    }
-
-    function calculateMaxOxygenValue(max_hr) {
-        return 15.3 * max_hr / 1000;
-    }
-
-    window.onload = function() {
-        var today = new Date();
-        var todayDateElement = document.getElementById('today_date');
-        todayDateElement.innerHTML = today.toLocaleDateString();
-    }
-
-    function exportValuesToCSV() {
-		var today_date = document.getElementById('today_date').textContent;
-        var name = document.getElementById('name').value;
-        var gender = document.getElementById('gender').value;
-        var birthdate = document.getElementById('birthdate').value;
-        var medical_record = document.getElementById('medical_record').value;
-        var stage1_hr = document.getElementById('stage1_hr').value;
-        var stage2_hr = document.getElementById('stage2_hr').value;
-        var stage3_hr = document.getElementById('stage3_hr').value;
-        var stage4_hr = document.getElementById('stage4_hr').value;
-        var stage5_hr = document.getElementById('stage5_hr').value;
-        var max_hr = document.getElementById('max_hr').textContent;
-        var max_oxygen_08 = document.getElementById('max_oxygen_08').textContent;
-        var max_oxygen = document.getElementById('max_oxygen').textContent;
-
-
-        var valuesToExport = [
-            ["檢查日期","姓名", "性別", "生日", "病歷號碼", "階段1心率", "階段2心率", "階段3心率", "階段4心率", "階段5心率", "最大心率", "0.8倍最大心率", "最大攝氧量"],
-            [today_date, name, gender, birthdate, medical_record, stage1_hr, stage2_hr, stage3_hr, stage4_hr, stage5_hr, max_hr, max_oxygen_08, max_oxygen]
-        ];
-
-     var csvData = valuesToExport.map(function(row) {
-        return row.join(",");
-    }).join("\n");
-
-    // 创建Blob对象，并设置字符编码为UTF-8
-    var blob = new Blob(["\ufeff", csvData], { type: "text/csv;charset=utf-8" });
-
-    // 创建URL对象
-    var csvURL = window.URL.createObjectURL(blob);
-
-    // 创建一个<a>元素来下载文件
-    var link = document.createElement("a");
-    link.setAttribute("href", csvURL);
-    link.setAttribute("download", "values.csv");
-    document.body.appendChild(link);
-
-    // 触发点击事件以下载文件
-    link.click();
-
-    }
-
-</script>
+    </style>
+ 
+</head>
 <body>
-    <h1>計算最大攝氧量</h1>
-    <p>今天日期: <span id="today_date"></span></p>
+    <div class="text-center"> 
+        <button class="btn btn-primary btn-lg" onclick="calculateMaxOxygen()">計算</button>
+        <button class="btn btn-primary btn-lg" id="myButton">查閱上傳資料</button>
+    </div>
+    <form
+        id = "form"
+        class = "mx-auto my-5 shadow p-2"
+        method = "POST"
+    >
+    <!-- action= will be set by javascript -->
+	     <div style="text-align: right;">
+		 <button type="submit" class="btn btn-primary">上傳資料</button>
+		 </div>
+        <div class="mb-3 text-left">
+            <label class="mb-3 text-left" for="name">姓名:</label>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                list="name"
+            />
+            <datalist id="name">
+                <!-- javascript will add options here -->
+            </datalist>
+        </div class="mb-3 text-left">       
+            <label  class="mb-3 text-left" for="gender">性別:</label>
+            <select id="gender" name="gender">
+              <option value="male">男</option>  
+              <option value="female">女</option>
+            </select>
+            <datalist id="gender">
+                <!-- javascript will add options here -->
+            </datalist>
+        </div>
+        <div class="mb-3 text-left">
+            <label class="mb-3 text-left" for="birthdate">生日:</label>
+            <input
+                type="date"
+                id="birthdate"
+                name="birthdate"
+                list="birthdate"
+            />
+            <datalist id="birthdate">
+                <!-- javascript will add options here -->                
+            </datalist>
+        </div>
+        <div class="mb-3 text-left">
+            <label class="mb-3 text-left" for="medical_record">病歷號碼:</label>
+            <input
+                type="text"
+                class="medical_record"
+                id="medical_record"
+                name="medical_record"
+            />
+            <datalist id="medical_record">
+                <!-- javascript will add options here -->                
+            </datalist>
+        </div>
+        <div class="mb-3 text-left">
+            <label class="mb-3 text-left" for="stage1_hr">階段 1 心率:</label>
+            <input
+                type="number"
+                class="stage_hr"
+                id="stage1_hr"
+                name="stage1_hr"
+            />
+            <datalist id="stage1_hr">
+                <!-- javascript will add options here -->                
+            </datalist>
+        </div>
+        <div class="mb-3 text-left">
+            <label class="mb-3 text-left" for="stage2_hr">階段 2 心率:</label>
+            <input
+                type="number"
+                class="stage_hr"
+                id="stage2_hr"
+                name="stage2_hr"
+            />
+            <datalist id="stage2_hr">
+                <!-- javascript will add options here -->                
+            </datalist>
+        </div>
+        <div class="mb-3 text-left">
+            <label class="mb-3 text-left" for="stage3_hr">階段 3 心率:</label>
+            <input
+                type="number"
+                class="stage_hr"
+                id="stage3_hr"
+                name="stage3_hr"
+            />
+            <datalist id="stage3_hr">
+                <!-- javascript will add options here -->                
+            </datalist>        
+        </div>
+        <div class="mb-3 text-left">
+            <label class="mb-3 text-left" for="stage4_hr">階段 4 心率:</label>
+            <input
+                type="number"
+                class="stage_hr"
+                id="stage4_hr"
+                name="stage4_hr"
+            />
+            <datalist id="stage4_hr">
+                <!-- javascript will add options here -->                
+            </datalist>        
+        </div>
+        <div class="mb-3 text-left">
+            <label class="mb-3 text-left" for="stage5_hr">階段 5 心率:</label>
+            <input
+                type="number"
+                class="stage_hr"
+                id="stage5_hr"
+                name="stage5_hr"
+            />
+            <datalist id="stage5_hr">
+                <!-- javascript will add options here -->                
+            </datalist>
+        </div>     
+        <p>今天日期: <span id="today_date"></span></p>
+        <h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;">最大心率：</h2>
+        <p id="max_hr"></p>       
+        <h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;"> 0.8倍最大心率：</h2>
+        <p id="max_oxygen_08"></p>
+    
+        <h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;"> 最大攝氧量：</h2>
+        <p id="max_oxygen"></p>
+        <div id="message" style="display: none;"></div>
+    
+        <h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;"> 圖表：</h2>
+        <div id="chart"></div>
 
-    <label for="name">姓名：</label>
-    <input type="text" id="name" required><br><br>
+        
+    </form>
 
-    <label for="gender">性别：</label>
-    <select id="gender" required>
-        <option value="male">男</option>
-        <option value="female">女</option>
-    </select><br><br>
+    
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        document.getElementById("myButton").addEventListener("click", function() {
+            // 在這裡指定要前往的網頁URL
+        window.location.href = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUfrItc7LBRVxzs9XjPldJZ--7so-fXduh-ijsX_0yn7tC7PQKjMZBDJoJXDdw4Znwbi_U4icZhE7Q/pubhtml?gid=737260878&single=true"; 
+        });
+        const url = "https://script.google.com/macros/s/AKfycbwZ4cmujkIfb_owiaNIrTHh_gmgXfic-0pqbRN57GTuHCudHIIVGq1sbyrevgHacFA5FQ/exec" // enter your public ('access' - 'anyone') deployment URL (NOT test deployment!)
+        document.getElementById('form').action = url;
+        var plot;
 
-    <label for="birthdate">生日：</label>
-    <input type="date" id="birthdate" required><br><br>
+function calculateMaxOxygen() {
+    if (plot) {
+        Plotly.purge('chart');
+    }
 
-    <label for="medical_record">病歷號碼：</label>
-    <input type="text" id="medical_record" required><br><br>
+    var stage_hr_values = [];
+    var stage_hr_elements = document.getElementsByClassName('stage_hr');
+    for (var i = 0; i < stage_hr_elements.length; i++) {
+        var value = parseInt(stage_hr_elements[i].value);
+        if (!isNaN(value)) {
+            stage_hr_values.push(value);
+        }
+    }
 
-    <h2>輸入各階段心率：</h2>
-    <label for="stage1_hr">階段 1 心率：</label>
-    <input type="number" class="stage_hr" id="stage1_hr" required><br><br>
+    var age = calculateAge();
 
-    <label for="stage2_hr">階段 2 心率：</label>
-    <input type="number" class="stage_hr" id="stage2_hr" required><br><br>
+    var max_hr = 220 - age;
+    window.max_hr = max_hr;
+    var max_hr_output = document.getElementById('max_hr');
+    var max_oxygen_output = document.getElementById('max_oxygen');
+    var max_oxygen_08_output = document.getElementById('max_oxygen_08');
 
-    <label for="stage3_hr">階段 3 心率：</label>
-    <input type="number" class="stage_hr" id="stage3_hr" required><br><br>
+    max_hr_output.innerHTML = max_hr;
+    max_oxygen_output.innerHTML = calculateMaxOxygenValue(max_hr).toFixed(2);
+    max_oxygen_08_output.innerHTML = (0.8 * max_hr).toFixed(2);
 
-    <label for="stage4_hr">階段 4 心率：</label>
-    <input type="number" class="stage_hr" id="stage4_hr" required><br><br>
+    if (stage_hr_values.length < 3) {
+        max_oxygen_output.innerHTML = 'Fail';
+        return;
+    }
 
-    <label for="stage5_hr">階段 5 心率：</label>
-    <input type="number" class="stage_hr" id="stage5_hr" required><br><br>
+    // Perform linear regression
+    var x = stage_hr_values;
+    var y = [14, 20, 26, 32, 38].slice(0, x.length);
 
-    <button onclick="calculateMaxOxygen()">計算</button>
-    <button onclick="exportValuesToCSV()">匯出資料</button> <!-- 添加匯出按钮 -->
+    var sumX = 0;
+    var sumY = 0;
+    var sumXY = 0;
+    var sumXX = 0;
 
-    <h2>最大心率：</h2>
-    <p id="max_hr"></p>
+    for (var i = 0; i < x.length; i++) {
+        sumX += x[i];
+        sumY += y[i];
+        sumXY += x[i] * y[i];
+        sumXX += x[i] * x[i];
+    }
 
-    <h2>0.8倍最大心率：</h2>
-    <p id="max_oxygen_08"></p>
+    var n = x.length;
+    var slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    var intercept = (sumY - slope * sumX) / n;
 
-    <h2>最大攝氧量：</h2>
-    <p id="max_oxygen"></p>
+    var max_oxygen = slope * max_hr + intercept;
 
-    <h2>圖表：</h2>
-    <div id="chart"></div>
+    // Display the result
+    max_oxygen_output.innerHTML = max_oxygen.toFixed(2);
+
+    // Plot the graph
+    var trace = {
+        x: x,
+        y: y,
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Data Points'
+    };
+
+    var regressionLine = {
+        x: [Math.min(...x), max_hr],
+        y: [intercept + slope * Math.min(...x), intercept + slope * max_hr],
+        mode: 'lines',
+        type: 'scatter',
+        name: 'Regression Line'
+    };
+
+    var maxOxygenPoint = {
+        x: [max_hr],
+        y: [max_oxygen],
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Max Oxygen',
+        marker: {
+            color: 'red',
+            size: 10
+        }
+    };
+
+    var layout = {
+        title: 'Max Oxygen and Heart Rate',
+        xaxis: { title: 'Heart Rate' },
+        yaxis: { title: 'Max Oxygen' }
+    };
+
+    var plotData = [trace, regressionLine, maxOxygenPoint];
+
+    plot = Plotly.newPlot('chart', plotData, layout);
+}
+
+function calculateAge() {
+    var birthdate = document.getElementById('birthdate').value;
+    var today = new Date();
+    var birthdateObj = new Date(birthdate);
+    var age = today.getFullYear() - birthdateObj.getFullYear();
+    var monthDiff = today.getMonth() - birthdateObj.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
+        age--;
+    }
+    return age;
+}
+
+function calculateMaxOxygenValue(max_hr) {
+    return 15.3 * max_hr / 1000;
+}
+
+window.onload = function() {
+    var today = new Date();
+    var todayDateElement = document.getElementById('today_date');
+    todayDateElement.innerHTML = today.toLocaleDateString();
+}
+
+        // fetching the data from each column in the sheet
+        // then populating the respective datalist
+        fetch(`${url}?header=name`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("name", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));
+
+        fetch(`${url}?header=gender`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("gender", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));
+        
+        fetch(`${url}?header=birthdate`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("birthdate", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));
+        fetch(`${url}?header=medical_record`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("medical_record", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));    
+        fetch(`${url}?header=stage1_hr`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("stage1_hr", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));
+        fetch(`${url}?header=stage2_hr`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("stage2_hr", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));
+        fetch(`${url}?header=stage3_hr`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("stage3_hr", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));
+        fetch(`${url}?header=stage4_hr`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("stage4_hr", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));
+        fetch(`${url}?header=stage5_hr`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("stage5_hr", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));                      
+        // function to add options to datalists
+        const populateDatalists = (id, arr) => {
+            let result = '';
+            for (const item of arr) {
+                result += `<option value="${item}">`;
+            }
+            document.getElementById(id).innerHTML = result;
+        }
+    </script>
 </body>
 </html>
