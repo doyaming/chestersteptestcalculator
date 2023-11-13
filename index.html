@@ -145,7 +145,7 @@
                 <!-- javascript will add options here -->                
             </datalist>
         </div> 
-        <div class="mb-3 text-left" style="display: none;>
+        <div class="mb-3 text-left" style="display: none;">
             <label class="mb-3 text-left" for="maxhrvalue">最大心率:</label>
             <input
                 type="number"
@@ -158,7 +158,7 @@
                 <!-- javascript will add options here -->                
             </datalist>
         </div>
-        <div class="mb-3 text-left" style="display: none;>
+        <div class="mb-3 text-left" style="display: none;">
             <label class="mb-3 text-left" for="maxhrvalue08">0.8倍最大心率:</label>
             <input
                 type="number"
@@ -167,11 +167,12 @@
                 name="maxhrvalue08"
                 readonly
             />
+            
             <datalist id="maxhrvalue08">
                 <!-- javascript will add options here -->                
             </datalist>
         </div>
-        <div class="mb-3 text-left" style="display: none;>
+        <div class="mb-3 text-left" style="display: none;">
             <label class="mb-3 text-left" for="oxygenmax">最大攝氧量:</label>
             <input
                 type="number"
@@ -238,7 +239,6 @@ function calculateMaxOxygen() {
     var max_oxygen_output = document.getElementById('max_oxygen');
     var max_oxygen_08_output = document.getElementById('max_oxygen_08');
     max_hr_output.innerHTML = max_hr;
-    
     max_oxygen_output.innerHTML = calculateMaxOxygenValue(max_hr).toFixed(2);
     max_oxygen_08_output.innerHTML = (0.8 * max_hr).toFixed(2);
     maxhrvalue08valueInput.value = (0.8 * max_hr).toFixed(2);
