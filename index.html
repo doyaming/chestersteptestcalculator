@@ -96,6 +96,7 @@
                 <!-- javascript will add options here -->                
             </datalist>
         </div>
+
         <div class="mb-3 text-left">
             <label class="mb-3 text-left" for="stage2_hr">階段 2 心率:</label>
             <input
@@ -143,7 +144,47 @@
             <datalist id="stage5_hr">
                 <!-- javascript will add options here -->                
             </datalist>
-        </div>     
+        </div> 
+        <div class="mb-3 text-left" style="display: none;>
+            <label class="mb-3 text-left" for="maxhrvalue">最大心率:</label>
+            <input
+                type="number"
+                class="maxhrvalue"
+                id="maxhrvalue"
+                name="maxhrvalue"
+                readonly
+            />
+            <datalist id="maxhrvalue">
+                <!-- javascript will add options here -->                
+            </datalist>
+        </div>
+        <div class="mb-3 text-left" style="display: none;>
+            <label class="mb-3 text-left" for="maxhrvalue08">0.8倍最大心率:</label>
+            <input
+                type="number"
+                class="maxhrvalue08"
+                id="maxhrvalue08"
+                name="maxhrvalue08"
+                readonly
+            />
+            <datalist id="maxhrvalue08">
+                <!-- javascript will add options here -->                
+            </datalist>
+        </div>
+        <div class="mb-3 text-left" style="display: none;>
+            <label class="mb-3 text-left" for="oxygenmax">最大攝氧量:</label>
+            <input
+                type="number"
+                class="oxygenmax"
+                id="oxygenmax"
+                name="oxygenmax"
+                readonly
+            />
+            <datalist id="oxygenmax">
+                <!-- javascript will add options here -->                
+            </datalist>
+        </div>    
+            
         <p>今天日期: <span id="today_date"></span></p>
         <h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;">最大心率：</h2>
         <p id="max_hr"></p>       
@@ -167,7 +208,7 @@
             // 在這裡指定要前往的網頁URL
         window.location.href = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUfrItc7LBRVxzs9XjPldJZ--7so-fXduh-ijsX_0yn7tC7PQKjMZBDJoJXDdw4Znwbi_U4icZhE7Q/pubhtml?gid=737260878&single=true"; 
         });
-        const url = "https://script.google.com/macros/s/AKfycbwZ4cmujkIfb_owiaNIrTHh_gmgXfic-0pqbRN57GTuHCudHIIVGq1sbyrevgHacFA5FQ/exec" // enter your public ('access' - 'anyone') deployment URL (NOT test deployment!)
+        const url = "https://script.google.com/macros/s/AKfycbz3YhqMNZ9KpEKXElYzD_n8U_yf3un504FGDscFhfE50LUcrlJfiBqGuBQkhTP4zTCF/exec" // enter your public ('access' - 'anyone') deployment URL (NOT test deployment!)
         document.getElementById('form').action = url;
         var plot;
 
@@ -189,13 +230,19 @@ function calculateMaxOxygen() {
 
     var max_hr = 220 - age;
     window.max_hr = max_hr;
+    var maxhrvalueInput = document.getElementById("maxhrvalue");
+    var maxhrvalue08valueInput = document.getElementById("maxhrvalue08");
+    var oxygenmaxvalueInput = document.getElementById("oxygenmax");
+    maxhrvalueInput.value = max_hr;
     var max_hr_output = document.getElementById('max_hr');
     var max_oxygen_output = document.getElementById('max_oxygen');
     var max_oxygen_08_output = document.getElementById('max_oxygen_08');
-
     max_hr_output.innerHTML = max_hr;
+    
     max_oxygen_output.innerHTML = calculateMaxOxygenValue(max_hr).toFixed(2);
     max_oxygen_08_output.innerHTML = (0.8 * max_hr).toFixed(2);
+    maxhrvalue08valueInput.value = (0.8 * max_hr).toFixed(2);
+    
 
     if (stage_hr_values.length < 3) {
         max_oxygen_output.innerHTML = 'Fail';
@@ -226,6 +273,7 @@ function calculateMaxOxygen() {
 
     // Display the result
     max_oxygen_output.innerHTML = max_oxygen.toFixed(2);
+    oxygenmaxvalueInput.value = max_oxygen.toFixed(2);;
 
     // Plot the graph
     var trace = {
@@ -355,7 +403,21 @@ window.onload = function() {
                 console.log(data);
                 populateDatalists("stage5_hr", data)
             })
-            .catch((error) => console.error('!!!!!!!!', error));                      
+            .catch((error) => console.error('!!!!!!!!', error));
+        fetch(`${url}?header=maxhrvalue`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("maxhrvalue", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));
+        fetch(`${url}?header=maxhrvalue08`)
+            .then((response) => response.json())
+            .then(({ data }) => {
+                console.log(data);
+                populateDatalists("maxhrvalue08", data)
+            })
+            .catch((error) => console.error('!!!!!!!!', error));                                  
         // function to add options to datalists
         const populateDatalists = (id, arr) => {
             let result = '';
