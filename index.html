@@ -12,34 +12,109 @@
         crossorigin="anonymous" 
     />
     <style>
-        form {
-            font-size: 20px !important;
-            width: auto;
-			
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-image: url("https://drive.google.com/uc?id=1Zm_EfAnJeBk3dKzGrjTZHMbxa0Pwz-oO");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column; /* Align items in a column */
         }
+
+        .form-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .form-group {
+            width: calc(33.33% - 20px); /* 33.33% width with a larger gap in between */
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="date"] {
+            /* Additional styling for date input if needed */
+        }
+
+        .stage_hr {
+            /* Additional styling for stage_hr class if needed */
+        }
+
         #chart {
-    width: 1000px;
-    height: 250px;
-}
+            width: 1000px;
+            height: 250px;
+        }
+
+        h2 {
+            font-size: 23px;
+            color: blue;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        #message {
+            display: none;
+            color: red;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+
+        /* Style for button container */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
     </style>
- 
+    <title>Styled Form</title>
 </head>
 <body>
-    <div class="text-center"> 
-        <button class="btn btn-outline-primary btn-lg" onclick="calculateMaxOxygen()">計算</button>
-        <button class="btn btn-outline-primary btn-lg" id="myButton">查閱上傳資料</button>
-    </div>
+ 
     <form
         id = "form"
-        class = "mx-auto my-5 shadow p-2"
         method = "POST"
+        class="form-container"
     >
     <!-- action= will be set by javascript -->
-	     <div style="text-align: right;">
-		 <button type="submit" class="btn btn-outline-danger btn-lg">上傳資料</button>
-		 </div>
-         <p>今天日期: <span id="today_date"></span></p>
-        <div class="mb-3 text-left">
+	     
+         
+         
+            <div class="form-group">
             <label class="mb-3 text-left" for="name">姓名:</label>
             <input
                 type="text"
@@ -47,20 +122,25 @@
                 name="name"
                 list="name"
             />
+        </div>
             <datalist id="name">
                 <!-- javascript will add options here -->
             </datalist>
-        </div class="mb-3 text-left">       
+        </div>
+        
+            <div class="form-group">   
             <label  class="mb-3 text-left" for="gender">性別:</label>
             <select id="gender" name="gender">
               <option value="male">男</option>  
               <option value="female">女</option>
             </select>
+        </div>
             <datalist id="gender">
                 <!-- javascript will add options here -->
             </datalist>
         </div>
-        <div class="mb-3 text-left">
+        
+            <div class="form-group">  
             <label class="mb-3 text-left" for="birthdate">生日:</label>
             <input
                 type="date"
@@ -68,11 +148,13 @@
                 name="birthdate"
                 list="birthdate"
             />
+        </div>
             <datalist id="birthdate">
                 <!-- javascript will add options here -->                
             </datalist>
         </div>
-        <div class="mb-3 text-left">
+        
+            <div class="form-group">  
             <label class="mb-3 text-left" for="medical_record">病歷號碼:</label>
             <input
                 type="text"
@@ -80,11 +162,13 @@
                 id="medical_record"
                 name="medical_record"
             />
+        </div>
             <datalist id="medical_record">
                 <!-- javascript will add options here -->                
             </datalist>
         </div>
-        <div class="mb-3 text-left">
+        
+            <div class="form-group"> 
             <label class="mb-3 text-left" for="stage1_hr">階段 1 心率:</label>
             <input
                 type="number"
@@ -92,12 +176,13 @@
                 id="stage1_hr"
                 name="stage1_hr"
             />
+        </div>
             <datalist id="stage1_hr">
                 <!-- javascript will add options here -->                
             </datalist>
         </div>
-
-        <div class="mb-3 text-left">
+        
+            <div class="form-group"> 
             <label class="mb-3 text-left" for="stage2_hr">階段 2 心率:</label>
             <input
                 type="number"
@@ -105,11 +190,13 @@
                 id="stage2_hr"
                 name="stage2_hr"
             />
+        </div>
             <datalist id="stage2_hr">
                 <!-- javascript will add options here -->                
             </datalist>
         </div>
-        <div class="mb-3 text-left">
+        
+            <div class="form-group"> 
             <label class="mb-3 text-left" for="stage3_hr">階段 3 心率:</label>
             <input
                 type="number"
@@ -117,11 +204,13 @@
                 id="stage3_hr"
                 name="stage3_hr"
             />
+        </div>
             <datalist id="stage3_hr">
                 <!-- javascript will add options here -->                
             </datalist>        
         </div>
-        <div class="mb-3 text-left">
+     
+            <div class="form-group"> 
             <label class="mb-3 text-left" for="stage4_hr">階段 4 心率:</label>
             <input
                 type="number"
@@ -129,11 +218,13 @@
                 id="stage4_hr"
                 name="stage4_hr"
             />
+        </div>
             <datalist id="stage4_hr">
                 <!-- javascript will add options here -->                
             </datalist>        
         </div>
-        <div class="mb-3 text-left">
+        
+            <div class="form-group"> 
             <label class="mb-3 text-left" for="stage5_hr">階段 5 心率:</label>
             <input
                 type="number"
@@ -141,6 +232,7 @@
                 id="stage5_hr"
                 name="stage5_hr"
             />
+        </div>
             <datalist id="stage5_hr">
                 <!-- javascript will add options here -->                
             </datalist>
@@ -198,10 +290,18 @@
     
         <h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;"> 圖表：</h2>
         <div id="chart"></div>
-
+       
+            <button type="submit" class="btn btn-outline-danger btn-lg">上傳資料</button>
+          
         
     </form>
-
+    
+    
+        <button class="btn btn-outline-primary btn-lg" onclick="calculateMaxOxygen()">計算</button>
+        <button class="btn btn-outline-primary btn-lg" id="myButton">查閱上傳資料</button>
+    
+    
+    <p>今天日期: <span id="today_date"></span></p>
     
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
@@ -209,7 +309,7 @@
             // 在這裡指定要前往的網頁URL
         window.location.href = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUfrItc7LBRVxzs9XjPldJZ--7so-fXduh-ijsX_0yn7tC7PQKjMZBDJoJXDdw4Znwbi_U4icZhE7Q/pubhtml?gid=737260878&single=true"; 
         });
-        const url = "https://script.google.com/macros/s/AKfycbz3YhqMNZ9KpEKXElYzD_n8U_yf3un504FGDscFhfE50LUcrlJfiBqGuBQkhTP4zTCF/exec" // enter your public ('access' - 'anyone') deployment URL (NOT test deployment!)
+        const url = "https://script.google.com/macros/s/AKfycbwZ4cmujkIfb_owiaNIrTHh_gmgXfic-0pqbRN57GTuHCudHIIVGq1sbyrevgHacFA5FQ/exec" // enter your public ('access' - 'anyone') deployment URL (NOT test deployment!)
         document.getElementById('form').action = url;
         var plot;
 
