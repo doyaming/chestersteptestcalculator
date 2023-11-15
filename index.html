@@ -96,9 +96,14 @@
         .button-container {
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            max-width: 800px;
-            margin-top: 20px;
+            margin: 20px; /* Optional: Add margin for spacing */
+        }
+        .button-container button:not(:last-child) {
+            margin-right: 40px;
+        }
+               .button-container button:hover {
+            background-color: #5bc0de; /* Change to the desired hover color */
+            color: #fff; /* Change to the desired text color on hover */
         }
     </style>
     <title>Styled Form</title>
@@ -292,13 +297,16 @@
         <div id="chart"></div>
        
             <button type="submit" class="btn btn-outline-danger btn-lg">上傳資料</button>
-          
+            
         
     </form>
     
     
-        <button class="btn btn-outline-primary btn-lg" onclick="calculateMaxOxygen()">計算</button>
-        <button class="btn btn-outline-primary btn-lg" id="myButton">查閱上傳資料</button>
+    <div class="button-container">   
+        <button class="btn btn-primary btn-lg" id="myButton">查閱上傳資料</button>
+        <button class="btn btn-warning btn-lg" onclick="calculateMaxOxygen()">執行計算</button>
+        <button class="btn btn-primary btn-lg" onclick="clearAllInputs()">清除全部輸入資料</button>
+    </div>
     
     
     <p>今天日期: <span id="today_date"></span></p>
@@ -309,7 +317,7 @@
             // 在這裡指定要前往的網頁URL
         window.location.href = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUfrItc7LBRVxzs9XjPldJZ--7so-fXduh-ijsX_0yn7tC7PQKjMZBDJoJXDdw4Znwbi_U4icZhE7Q/pubhtml?gid=737260878&single=true"; 
         });
-        const url = "https://script.google.com/macros/s/AKfycbwZ4cmujkIfb_owiaNIrTHh_gmgXfic-0pqbRN57GTuHCudHIIVGq1sbyrevgHacFA5FQ/exec" // enter your public ('access' - 'anyone') deployment URL (NOT test deployment!)
+        const url = "https://script.google.com/macros/s/AKfycbz3YhqMNZ9KpEKXElYzD_n8U_yf3un504FGDscFhfE50LUcrlJfiBqGuBQkhTP4zTCF/exec" // enter your public ('access' - 'anyone') deployment URL (NOT test deployment!)
         document.getElementById('form').action = url;
         var plot;
 
@@ -436,7 +444,21 @@ window.onload = function() {
     var todayDateElement = document.getElementById('today_date');
     todayDateElement.innerHTML = today.toLocaleDateString();
 }
+function clearAllInputs() {
+            // 獲取所有輸入框和選擇框元素
+            var inputElements = document.querySelectorAll('input, select');
 
+            // 將每個輸入框和選擇框的值設置為空字符串
+            inputElements.forEach(function(element) {
+                element.value = '';
+            });
+            document.getElementById('max_hr').textContent = '';
+            document.getElementById('max_oxygen_08').textContent = '';
+            document.getElementById('max_oxygen').textContent = '';
+            document.getElementById('message').style.display = 'none';
+            var chartElement = document.getElementById('chart');
+            chartElement.innerHTML = '';
+        }
         // fetching the data from each column in the sheet
         // then populating the respective datalist
         fetch(`${url}?header=name`)
