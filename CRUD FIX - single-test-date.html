@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>最大攝氧量檢查資料上傳</title>
+  <link 
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+      rel="stylesheet" 
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+      crossorigin="anonymous" 
+  />
+<head>
+  <style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-image: url("https://drive.google.com/uc?id=1Zm_EfAnJeBk3dKzGrjTZHMbxa0Pwz-oO");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; /* Align items in a column */
+}
+   .form-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: rgb(255, 255, 255, 0.5);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+label {
+    display: block;
+    margin-bottom: 8px;
+    text-align: center; 
+    font-weight: bold;
+}
+#chart {
+    width: 1000px;
+    height: 250px;
+}   
+.form-group {
+    width: calc(33.33% - 20px); /* 33.33% width with a larger gap in between */
+    margin-bottom: 20px;
+}
+.data-table {
+
+width: 100%;
+
+}
+
+.data-table th, .data-table td {
+border: 1px solid #dddddd;
+text-align: center;
+vertical-align: middle;
+padding: 8px;
+display: table-cell;
+}
+
+.data-table th {
+background-color: #AAAAAA;
+}
+
+.data-table tr:hover {
+background-color: #BBFFEE;
+}
+
+.deleteCheckbox {
+margin: 0;
+}
+table,
+th,
+td {
+margin: 10px 0;
+border: solid 1px #f7f5f5;
+padding: 2px 4px;
+font: 15px Verdana;
+}
+
+th {
+font-weight: bold;
+}
+
+#loader {
+border: 16px solid #f3f3f3;
+border-radius: 50%;
+border-top: 16px solid blue;
+border-bottom: 16px solid blue;
+width: 60px;
+height: 60px;
+-webkit-animation: spin 2s linear infinite;
+animation: spin 2s linear infinite;
+visibility: hidden;
+}
+input,select {
+width: 100%;  /* 设置输入框和选择框的宽度，留出一些间距 */
+padding: 8px;
+box-sizing: border-box;
+margin-bottom: 10px;
+border: 1px solid #ccc;
+border-radius: 4px;
+}
+
+@-webkit-keyframes spin {
+0% {
+-webkit-transform: rotate(0deg);
+}
+
+100% {
+-webkit-transform: rotate(360deg);
+}
+}
+
+@keyframes spin {
+0% {
+transform: rotate(0deg);
+}
+
+100% {
+transform: rotate(360deg);
+}
+}
+#today_date {
+    font-size: 20px; /* You can adjust the size as needed */
+}  
+
+#loader {
+margin-bottom: 20px; /* 设置 loader 底部间距 */
+}
+
+.button-container {
+display: flex;
+gap: 10px; /* 设置按钮之间的间距 */
+}
+
+.button-container input {
+flex: 1; /* 让按钮平分宽度，可根据需要调整 */
+}
+h2 {
+text-align: center;
+}
+.label-input-group input {/* 調整寬度，根據需要調整數值 */
+    text-align: center; /* 將輸入框內容置中 */
+}
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select {
+    text-align: center;
+}
+</style>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script>
+    var script_url = "https://script.google.com/macros/s/AKfycbz0_3vD9ja3WBvJ8eZLY88Xm2-v6O8UvvaYSqCKOsFntKoYpmy89K3DlXpv8GLKWCKH/exec";
+
+    // Make an AJAX call to Google Script
+
+
+
+
+    function delete_value() {
+  $("#re").css("visibility", "hidden");
+  document.getElementById("loader").style.visibility = "visible";
+  $('#mySpinner').addClass('spinner');
+
+  // 取得選中的單選按鈕的值
+  var selectedId = $(".deleteRadio:checked").data("id");
+
+  // 檢查是否有選中單選按鈕
+  if (selectedId) {
+    // 進行刪除的 AJAX 請求
+    var url = script_url + "?callback=ctrlq&action=delete&ids=" + selectedId;
+    var request = jQuery.ajax({
+      crossDomain: true,
+      url: url,
+      method: "GET",
+      dataType: "jsonp"
+    });
+  } else {
+    // 如果沒有選中單選按鈕，顯示警告或執行其他處理
+    alert("請選擇要刪除的資料行");
+    document.getElementById("loader").style.visibility = "hidden";
+    $("#re").css("visibility", "visible");
+  }
+}
+
+
+    // print the returned data
+    function ctrlq(e) {
+      $("#re").html(e.result);
+      $("#re").css("visibility", "visible");
+      read_value();
+    }
+
+    function read_value() {
+    $("#toggleButton").remove();
+    $("#re").css("visibility", "hidden");
+    document.getElementById("loader").style.visibility = "visible";
+    var url = script_url + "?action=read";
+    var inputID = $("#pid").val(); // 請替換成你實際輸入ID的元素ID
+    var startDate = $("#startDate").val(); 
+    var endDate = $("#endDate").val();  
+    var toggleButton = $("<button>")
+        .text("控制列印版面")
+        .attr("id", "toggleButton")
+        .addClass("btn btn-primary")
+        .css("font-size", "18px")
+        .css("font-weight", "bold");
+    $("body").append(toggleButton);
+    $("#toggleButton").on("click", function () {
+    // 切換顯示/隱藏 .data-cell, .deleteRadio, .radio
+    $("#showData .data-cell, #showData .deleteRadio, #showData .radio").toggle();
+    // 切換顯示/隱藏 .input-container, .button-container
+    $(".input-container, .button-container").toggle();
+    // 切換顯示/隱藏 .data-table 的 border
+    var dataTable = $("#showData .data-table");
+    dataTable.css("border", dataTable.css("border") === "none" ? "1px solid #dddddd" : "none");
+    // 切換顯示/隱藏 .data-table th, .data-table td
+    var dataTableCells = $("#showData .data-table th, #showData .data-table td");
+    var displayValue = dataTableCells.css("display") === "none" ? "table-cell" : "none";
+    dataTableCells.css("display", displayValue);
+    // 切換顯示/隱藏搜尋出來的資料
+    $("#showData tr:has(.data-cell)").toggle();
+});
+    $.getJSON(url, function (json) {
+        // CREATE DYNAMIC TABLE.
+        var table = $("<table>").addClass("data-table");
+        // Create table header
+        var headerRow = $("<tr>");
+        headerRow.append($("<th>").text("檢查日期").addClass("data-cell")); 
+        headerRow.append($("<th>").text("病歷號碼").addClass("data-cell"));
+        headerRow.append($("<th>").text("姓名").addClass("data-cell"));
+        headerRow.append($("<th>").text("性別").addClass("data-cell"));
+        headerRow.append($("<th>").text("生日").addClass("data-cell"));
+        headerRow.append($("<th>").text("階段1").addClass("data-cell"));
+        headerRow.append($("<th>").text("階段2").addClass("data-cell"));
+        headerRow.append($("<th>").text("階段3").addClass("data-cell"));
+        headerRow.append($("<th>").text("階段4").addClass("data-cell"));
+        headerRow.append($("<th>").text("階段5").addClass("data-cell"));
+        headerRow.append($("<th>").text("選擇資料").addClass("data-cell"));
+        table.append(headerRow);
+        var foundMatchingData = false;
+        // ADD JSON DATA TO THE TABLE AS ROWS.
+        if (json.records.length === 0 || (!inputID && !startDate && !endDate)) {
+            var noDataMessage = $("<tr>").append($("<td colspan='8'>").text("未輸入資料."));
+            table.append(noDataMessage);
+        } else {
+            for (var i = 0; i < json.records.length; i++) {
+                var rowData = json.records[i];
+                var exdate = new Date(rowData.Date);
+                var formattedCurrentTime = exdate.toISOString().split('T')[0];
+                // 檢查是否符合搜尋的ID，如果有輸入ID就只加入符合的資料
+                if ((!inputID || rowData.ID.toString() === inputID) &&
+                    (!startDate || formattedCurrentTime >= startDate) &&
+                    (!endDate || formattedCurrentTime <= endDate)) {
+                    var row = $("<tr>");
+                    var date = new Date(rowData.Date);
+                    var formattedDate = date.toLocaleDateString("zh-TW", { year: 'numeric', month: '2-digit', day: '2-digit' });
+                    row.append($("<td>").text(formattedDate).addClass("data-cell"));     
+                    row.append($("<td>").text(rowData.ID).addClass("data-cell"));
+                    row.append($("<td>").text(rowData.name).addClass("data-cell"));
+                    row.append($("<td>").text(rowData.gender).addClass("data-cell"));
+                    var birthdate = new Date(rowData.birthdate);
+                    var formattedDate = birthdate.toISOString().split('T')[0];
+                    row.append($("<td>").text(formattedDate).addClass("data-cell"));
+                    row.append($("<td>").text(rowData.stage1_hr).addClass("data-cell"));
+                    row.append($("<td>").text(rowData.stage2_hr).addClass("data-cell"));
+                    row.append($("<td>").text(rowData.stage3_hr).addClass("data-cell"));
+                    row.append($("<td>").text(rowData.stage4_hr).addClass("data-cell"));
+                    row.append($("<td>").text(rowData.stage5_hr).addClass("data-cell"));
+
+                    var deleteCell = $("<td>");
+                    var radio = $("<input>")
+                        .attr("type", "radio")
+                        .addClass("deleteRadio")
+                        .attr("name", "deleteRadioGroup")
+                        .attr("data-id", rowData.ID)
+                        .on("change", createRadioChangeHandler(rowData));
+                    radio.on("change", (function (row) {
+                        return function () {
+                            createRadioChangeHandler(row);
+                        };
+                    })(rowData));
+                    deleteCell.append(radio);
+                    row.append(deleteCell);
+
+                    table.append(row);
+                    foundMatchingData = true;
+                }
+            }
+            if (!foundMatchingData) {
+                var noDataMessage = $("<tr><td colspan='8'>找不到相符資料.</td></tr>");
+                table.append(noDataMessage);
+            }
+        }
+
+        var divContainer = $("#showData");
+        divContainer.html("");
+        divContainer.append(table);
+        document.getElementById("loader").style.visibility = "hidden";
+        $("#re").css("visibility", "visible");
+    });
+}
+
+function createRadioChangeHandler(rowData) {
+  return function () {
+    // 當單選按鈕改變時，更新輸入值
+    if ($(this).prop("checked")) {
+      $("#id").val(rowData.ID);
+      $("#name").val(rowData.name);
+      $("#gender").val(rowData.gender);
+      var birthdate = new Date(rowData.birthdate);
+      var formattedDate = birthdate.toISOString().split('T')[0];
+      $("#birthdate").val(formattedDate);
+      $("#stage1_hr").val(rowData.stage1_hr);
+      $("#stage2_hr").val(rowData.stage2_hr);
+      $("#stage3_hr").val(rowData.stage3_hr);
+      $("#stage4_hr").val(rowData.stage4_hr);
+      $("#stage5_hr").val(rowData.stage5_hr);
+    } else {
+      // 如果單選按鈕未選中，你可以決定是否清除輸入值
+      // $("#name").val('');
+    }
+  };
+}
+        function clearInputs() {
+        // Clear input values
+        $("#id, #name, #gender, #birthdate, #stage1_hr, #stage2_hr, #stage3_hr, #stage4_hr, #stage5_hr").val('');
+        
+        }
+ 
+  </script>
+</head>
+
+<body>
+  <div align="center">
+  
+
+    
+    <form
+    id = "form"
+    method = "POST"
+    class="form-container">
+    <div class="form-group">  
+      <label class="mb-3 text-left" for="id">病歷號碼:</label>
+      <input
+          type="text"
+          class="id"
+          id="id"
+          name="id"
+          readonly
+      />
+  </div>
+    <div class="form-group">
+      <label class="mb-3 text-left" for="name">姓名:</label>
+      <input
+          type="text"
+          id="name"
+          name="name"
+          list="name"
+          readonly="readonly"
+      />
+  </div>     
+  <div class="form-group">   
+  <label  class="mb-3 text-left" for="gender">性別:</label>
+  <select id="gender" name="gender" disabled>
+  <option value="male">男</option>  
+  <option value="female">女</option>
+  
+  </select>
+  
+</div>
+        
+<div class="form-group">  
+<label class="mb-3 text-left" for="birthdate">生日:</label>
+<input
+    type="text"
+    id="birthdate"
+    name="birthdate"
+    readonly="readonly"
+/>
+</div>
+
+<div class="form-group"> 
+<label class="mb-3 text-left" for="stage1_hr">階段 1 心率:</label>
+<input
+    type="number"
+    class="stage_hr"
+    id="stage1_hr"
+    name="stage1_hr"
+    readonly="readonly"
+/>
+</div>
+<div class="form-group"> 
+<label class="mb-3 text-left" for="stage2_hr">階段 2 心率:</label>
+<input
+    type="number"
+    class="stage_hr"
+    id="stage2_hr"
+    name="stage2_hr"
+    readonly="readonly"
+/>
+</div>
+<div class="form-group"> 
+<label class="mb-3 text-left" for="stage3_hr">階段 3 心率:</label>
+<input
+    type="number"
+    class="stage_hr"
+    id="stage3_hr"
+    name="stage3_hr"
+    readonly="readonly"
+/>
+</div>
+<div class="form-group"> 
+<label class="mb-3 text-left" for="stage4_hr">階段 4 心率:</label>
+<input
+    type="number"
+    class="stage_hr"
+    id="stage4_hr"
+    name="stage4_hr"
+    readonly="readonly"
+/>
+</div>
+<div class="form-group"> 
+<label class="mb-3 text-left" for="stage5_hr">階段 5 心率:</label>
+<input
+    type="number"
+    class="stage_hr"
+    id="stage5_hr"
+    name="stage_hr"
+    readonly="readonly"
+/>
+</div>
+<div class="mb-3 text-left" style="display: none;">
+  <label class="mb-3 text-left" for="maxhrvalue">最大心率:</label>
+  <input
+      type="number"
+      class="maxhrvalue"
+      id="maxhrvalue"
+      name="maxhrvalue"
+      readonly
+  />
+
+</div>
+<div class="mb-3 text-left" style="display: none;">
+  <label class="mb-3 text-left" for="maxhrvalue08">0.8倍最大心率:</label>
+  <input
+      type="number"
+      class="maxhrvalue08"
+      id="maxhrvalue08"
+      name="maxhrvalue08"
+      readonly
+  />
+  
+</div>
+<div class="mb-3 text-left" style="display: none;">
+  <label class="mb-3 text-left" for="oxygenmax">最大攝氧量:</label>
+  <input
+      type="text"
+      class="oxygenmax"
+      id="oxygenmax"
+      name="oxygenmax"
+      readonly
+  />
+</div>        
+            
+        
+<h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;">最大心率：</h2>
+<p id="max_hr"></p>       
+<h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;"> 0.8倍最大心率：</h2>
+<p id="max_oxygen_08"></p>
+
+<h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;"> 最大攝氧量：</h2>
+<p id="max_oxygen"></p>
+<div id="message" style="display: none;"></div>
+
+<h2 class="mb-3 text-left" style="font-size: 23px; color: blue; font-weight: bold;"> 圖表：</h2>
+<div id="chart"></div>
+    </form>
+    
+    <p>今天日期: <span id="today_date"></span></p>
+
+        <div class="container mt-5">
+        <div id="showData" class="mt-4"></div>
+        <div id="loader"></div>
+        <div class="input-container">
+          <div class="label-input-group">
+              <label for="pid">病歷號碼</label>
+              <input type="text" class="pid" id="pid" name="pid"/>
+          </div>
+          
+          <div class="label-input-group">
+              <label for="startDate">體檢開始日期：</label>
+              <input type="date" id="startDate" name="startDate">
+          </div>
+      
+          <div class="label-input-group">
+              <label for="endDate">體檢結束日期：</label>
+              <input type="date" id="endDate" name="endDate">
+          </div>
+      </div>
+        <div class="button-container">
+        <input type="button" onclick="read_value()" class="btn btn-success" value="查詢">
+        <input type="button" onclick="calculateMaxOxygen()" class="btn btn-warning" value="執行計算">
+        <input type="button" onclick="clearInputs()" class="btn btn-danger" value="清除輸入">
+        </div>
+  
+      <!-- Optional: Add your scripts here -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha2/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+      <script>
+      var plot;
+      function calculateMaxOxygen() {
+    if (plot) {
+        Plotly.purge('chart');
+    }
+
+    var stage_hr_values = [];
+    var stage_hr_elements = document.getElementsByClassName('stage_hr');
+    for (var i = 0; i < stage_hr_elements.length; i++) {
+        var value = parseInt(stage_hr_elements[i].value);
+        if (!isNaN(value)) {
+            stage_hr_values.push(value);
+        }
+    }
+
+    var age = calculateAge();
+
+    var max_hr = 220 - age;
+    window.max_hr = max_hr;
+    var maxhrvalueInput = document.getElementById("maxhrvalue");
+    var maxhrvalue08valueInput = document.getElementById("maxhrvalue08");
+    var oxygenmaxvalueInput = document.getElementById("oxygenmax");
+    maxhrvalueInput.value = max_hr;
+    var max_hr_output = document.getElementById('max_hr');
+    var max_oxygen_output = document.getElementById('max_oxygen');
+    var max_oxygen_08_output = document.getElementById('max_oxygen_08');
+    max_hr_output.innerHTML = max_hr;
+    max_oxygen_output.innerHTML = calculateMaxOxygenValue(max_hr).toFixed(2);
+    max_oxygen_08_output.innerHTML = (0.8 * max_hr).toFixed(2);
+    maxhrvalue08valueInput.value = (0.8 * max_hr).toFixed(2);
+    
+    
+
+    if (stage_hr_values.length < 3) {
+        max_oxygen_output.innerHTML = "Fail";
+        oxygenmaxvalueInput.value = "Fail";
+        return;
+    }
+
+    // Perform linear regression
+    var x = stage_hr_values;
+    var y = [14, 20, 26, 32, 38].slice(0, x.length);
+
+    var sumX = 0;
+    var sumY = 0;
+    var sumXY = 0;
+    var sumXX = 0;
+
+    for (var i = 0; i < x.length; i++) {
+        sumX += x[i];
+        sumY += y[i];
+        sumXY += x[i] * y[i];
+        sumXX += x[i] * x[i];
+    }
+
+    var n = x.length;
+    var slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    var intercept = (sumY - slope * sumX) / n;
+
+    var max_oxygen = slope * max_hr + intercept;
+
+    // Display the result
+    max_oxygen_output.innerHTML = max_oxygen.toFixed(2);
+    oxygenmaxvalueInput.value = max_oxygen.toFixed(2);
+    
+ 
+    // Plot the graph
+    var trace = {
+        x: x,
+        y: y,
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Data Points'
+    };
+
+    var regressionLine = {
+        x: [Math.min(...x), max_hr],
+        y: [intercept + slope * Math.min(...x), intercept + slope * max_hr],
+        mode: 'lines',
+        type: 'scatter',
+        name: 'Regression Line'
+    };
+
+    var maxOxygenPoint = {
+        x: [max_hr],
+        y: [max_oxygen],
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Max Oxygen',
+        marker: {
+            color: 'red',
+            size: 10
+        }
+    };
+
+    var layout = {
+        title: 'Max Oxygen and Heart Rate',
+        xaxis: { title: 'Heart Rate' },
+        yaxis: { title: 'Max Oxygen' }
+    };
+
+    var plotData = [trace, regressionLine, maxOxygenPoint];
+
+    plot = Plotly.newPlot('chart', plotData, layout);
+}
+
+function calculateAge() {
+    var birthdate = document.getElementById('birthdate').value;
+    var today = new Date();
+    var birthdateObj = new Date(birthdate);
+    var age = today.getFullYear() - birthdateObj.getFullYear();
+    var monthDiff = today.getMonth() - birthdateObj.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
+        age--;
+    }
+    return age;
+}
+
+function calculateMaxOxygenValue(max_hr) {
+    return 15.3 * max_hr / 1000;
+}
+
+window.onload = function() {
+    var today = new Date();
+    var todayDateElement = document.getElementById('today_date');
+    todayDateElement.innerHTML = today.toLocaleDateString();
+}
+function clearInputs() {
+    // 清除輸入框的值
+    $("#pid, #startDate, #endDate").val('');
+}
+</script>
+      
+</body>
+<html>
